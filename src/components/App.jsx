@@ -78,7 +78,7 @@ class App extends Component {
   }
 
   render() {
-    if (activepage == 1){
+    if (activepage === 1){
       this.setState({
         searchOn : false
       })
@@ -90,7 +90,7 @@ class App extends Component {
     return (
       <div className="App">
         {
-        bookList.length > 0 ?
+        bookList.length > 0 || searchOn ? 
         <FormGroup>
             <InputGroup>
               <FormControl
