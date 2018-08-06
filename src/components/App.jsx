@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
 import axios from 'axios';
-import {FormGroup, FormControl, InputGroup, Glyphicon, Button} from 'react-bootstrap';
 import {Redirect } from 'react-router-dom';
 
 import Loader from './Loader';
+import Search from './Search';
 import Pagination from './Pagination';
 import BookList from './BookList';
 
@@ -21,32 +21,20 @@ class App extends Component {
         searchOn: false
     };
     this.onChangePage = this.onChangePage.bind(this);
-    this.search = this.search.bind(this);
+    this.setBooklist = this.setBooklist.bind(this);
+    this.setSearchOn = this.setSearchOn.bind(this);
   }
 
   onChangePage(pageOfBooks) {
     this.setState({ pageOfBooks: pageOfBooks });
   }
 
-  search(){
-    const {query, count} = this.state;
-    let currentComponent = this;
-    axios.post('http://nyx.vima.ekt.gr:3000/api/books', {
-      page : 1,
-      itemsPerPage : count, 
-      filters:[{type: "all", values: [query]}]
-    })
-    .then(function (response) {
-      currentComponent.setState({
-        bookList : response.data.books
-      })
-    })
-    .catch(function (error) {
-      console.log(error);
-    });
-    currentComponent.setState({
-      searchOn : true
-    })
+  setBooklist(bookList){
+    this.setState({bookList:bookList});
+  }
+
+  setSearchOn(searchOn){
+    this.setState({searchOn:searchOn});
   }
 
   componentDidMount(){
@@ -78,40 +66,22 @@ class App extends Component {
   }
 
   render() {
+    
     if (activepage === 1){
       this.setState({
         searchOn : false
       })
     }
-    const { bookList, pageOfBooks, searchOn } = this.state;
+    
+    const { bookList, pageOfBooks, searchOn , count } = this.state;
     let   { activepage } = this.props.match.params;
     activepage = parseInt(activepage);
-    
+
     return (
       <div className="App">
         {
-        bookList.length > 0 || searchOn ? 
-        <FormGroup>
-            <InputGroup>
-              <FormControl
-                type='text'
-                placeholder='Search for a book'
-                onChange={event => {
-                  this.setState(
-                    {
-                      query: event.target.value
-                    }                               
-                  )
-                }}
-                onKeyPress={event => {
-                  if (event.key === 'Enter') { this.search() }
-                }}
-              />
-              <Button onClick={() => this.search()}>
-                <Glyphicon glyph="search" /> Search
-              </Button>
-            </InputGroup>
-        </FormGroup>
+        bookList.length > 0 || searchOn ?
+        <Search count={count} setBooklist={this.setBooklist} setSearchOn={this.setSearchOn}/> 
         : ''
         }
         {
